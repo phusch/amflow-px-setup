@@ -5,8 +5,45 @@
   "tireType": "Tubeless",
   "profiles": {
     "current": {
-      "eco_support": "4",
-      "eco_torque": "55"
+      "eco_support": "3",
+      "eco_torque": "50",
+      "eco_power": "200",
+      "eco_start": "3",
+      "eco_overrun": "1",
+      "eco_cont": "3",
+      "auto_support": "7-11",
+      "auto_torque": "85",
+      "auto_power": "900",
+      "auto_start": "3",
+      "auto_overrun": "1",
+      "auto_cont": "3",
+      "trail_support": "9-11",
+      "trail_torque": "120",
+      "trail_power": "1000",
+      "trail_start": "3",
+      "trail_overrun": "2",
+      "trail_cont": "3",
+      "turbo_support": "13",
+      "turbo_torque": "130",
+      "turbo_power": "1300",
+      "turbo_overrun": "1",
+      "turbo_cont": "4",
+      "turbo_start": "3",
+      "boost_local": "Ein",
+      "boost_mode": "30 sek",
+      "tire_dry_front": "1,75",
+      "tire_dry_rear": "2,0",
+      "tire_wet_front": "1,75",
+      "tire_wet_rear": "2,0",
+      "battery_daily": "80",
+      "battery_tour": "100",
+      "battery_reserve": "Nach tour",
+      "geometry": "Serie",
+      "chainstay": "Serie",
+      "chain_protect": "Ein",
+      "smoothshift": "Ein",
+      "heart_control": "Aus",
+      "speed_limit": "Amerika"
     },
     "forest": {
       "eco_support": "4",
@@ -117,7 +154,7 @@
   },
   "rides": [],
   "meta": {
-    "updatedAt": "2026-10-12T12:45:31.853Z",
+    "updatedAt": "2026-10-12T13:12:06.071Z",
     "source": "Manuelle Erfassung"
   }
 }
