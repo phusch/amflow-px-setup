@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#142c38">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PX Setup">
+  <meta name="description" content="Avinox PX Carbon Pro 2026: Ist-Werte, Waldtrail- und Allgäu-Setup vergleichen, testen und synchronisieren.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>PX Setup Cockpit · V1.0.0</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-top"><div class="brand"><div class="brand-icon">PX<span>↗</span></div><div><span class="eyebrow">AMFLOW · AVINOX M2S</span><h1>Bike Setup Cockpit</h1></div></div><span class="version">V1.0.0</span></div>
+      <p>Deine Ist-Einstellungen, zwei Tourenprofile und echte Testfahrten – auf Mac, iPad und iPhone.</p>
+      <div class="hero-bottom"><span class="hero-tag">90–99 kg inkl. Ausrüstung</span><span class="hero-tag">Tubeless</span><span class="hero-tag">PX Carbon Pro · 2026</span></div>
+    </header>
+    <nav class="tabs" aria-label="Hauptnavigation">
+      <button class="tab active" data-tab="compare" aria-current="page">◫ <span>Vergleich</span></button>
+      <button class="tab" data-tab="rides">↗ <span>Testfahrten</span></button>
+      <button class="tab" data-tab="sync">⇄ <span>Speichern & GitHub</span></button>
+      <button class="tab" data-tab="help">ⓘ <span>Hilfe</span></button>
+    </nav>
+    <main>
+      <section class="panel" id="panel-compare">
+        <div class="section-heading"><div><span class="eyebrow dark">DEIN SETUP AUF EINEN BLICK</span><h2>Alle Werte im direkten Vergleich</h2><p>„Mein Bike“ bleibt leer, bis du den tatsächlichen Wert am Rad geprüft und eingetragen hast.</p></div><button id="export-csv" class="button light">↧ Vergleich als CSV</button></div>
+        <div class="profile-legend"><span class="legend-pill current"><i></i> MEIN BIKE <small>Ist · editierbar</small></span><span class="legend-pill forest"><i></i> WALDTRAIL <small>Empfehlung · editierbar</small></span><span class="legend-pill alpine"><i></i> ALLGÄU BERGE <small>Empfehlung · editierbar</small></span></div>
+        <div class="callout">ℹ️ Die App <strong>liest keine Einstellungen direkt aus dem Fahrrad</strong> und schreibt auch keine Werte in die Avinox Ride App. Du dokumentierst hier die Einstellungen und überträgst sie selbst am Bike.</div>
+        <div class="compare-controls"><label for="group-filter">Anzeigen</label><select id="group-filter"><option value="all">Alle Einstellungen</option><option value="motor">Motor (ECO / AUTO / TRAIL / TURBO)</option><option value="fork">Gabel & Dämpfer</option><option value="tires">Reifen, Akku & Technik</option></select><label class="inline-check"><input type="checkbox" id="only-diffs"> Nur Unterschiede zwischen Empfehlungen</label></div>
+        <div id="comparison-tables"></div>
+        <div class="action-strip"><button class="button light" id="reset-recos">↶ Empfehlungen zurücksetzen</button><button class="button primary" id="download-json-compare">↧ JSON-Backup</button></div>
+      </section>
+      <section class="panel hidden" id="panel-rides">
+        <div class="section-heading"><div><span class="eyebrow dark">LERNEN STATT RATEN</span><h2>Testfahrten protokollieren</h2><p>Fahre möglichst dieselbe Runde und verändere pro Test nur wenige Einstellungen.</p></div></div>
+        <form id="ride-form" class="ride-form">
+          <input type="hidden" id="ride-id">
+          <div class="field"><label for="ride-date">Datum</label><input id="ride-date" type="date" required></div>
+          <div class="field"><label for="ride-profile">Getestetes Profil</label><select id="ride-profile"><option value="current">Mein Bike</option><option value="forest">Waldtrail</option><option value="alpine">Allgäu Berge</option></select></div>
+          <div class="field wide"><label for="ride-route">Tour / Strecke</label><input id="ride-route" maxlength="130" placeholder="z. B. Aichwald – Waldtrailrunde" required></div>
+          <div class="field"><label for="ride-km">Distanz in km</label><input id="ride-km" type="number" min="0" max="500" step="0.1" placeholder="28,5"></div>
+          <div class="field"><label for="ride-hm">Höhenmeter aufwärts</label><input id="ride-hm" type="number" min="0" max="8000" step="1" placeholder="620"></div>
+          <div class="field"><label for="ride-batstart">Akku Start (%)</label><input id="ride-batstart" type="number" min="0" max="100" step="1" placeholder="100"></div>
+          <div class="field"><label for="ride-batend">Akku Ende (%)</label><input id="ride-batend" type="number" min="0" max="100" step="1" placeholder="58"></div>
+          <div class="field"><label for="ride-surface">Untergrund</label><select id="ride-surface"><option>Gemischte Waldtrails</option><option>Trocken / fest</option><option>Nass / Wurzeln</option><option>Lose / Schotter</option><option>Alpin / steinig</option></select></div>
+          <div class="field"><label for="ride-traction">Traktion (1 schwach – 5 top)</label><select id="ride-traction"><option value="">Nicht bewertet</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+          <div class="field"><label for="ride-comfort">Fahrwerk (1 hart – 5 top)</label><select id="ride-comfort"><option value="">Nicht bewertet</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+          <div class="field"><label for="ride-drive">Motor-Dosierung (1–5)</label><select id="ride-drive"><option value="">Nicht bewertet</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+          <div class="field wide"><label for="ride-notes">Beobachtungen und nächste Änderung</label><textarea id="ride-notes" rows="3" maxlength="2000" placeholder="z. B. bergauf sehr gut, auf nassen Wurzeln zu viel Nachlauf ..."></textarea></div>
+          <div class="form-actions"><button type="submit" class="button primary" id="save-ride">Testfahrt speichern</button><button type="button" class="button light" id="cancel-ride">Zurücksetzen</button></div>
+        </form>
+        <div class="ride-list-heading"><h3>Dein Fahrtenbuch</h3><span id="ride-count" class="subtle"></span></div>
+        <div id="ride-list" class="ride-list"></div>
+      </section>
+      <section class="panel hidden" id="panel-sync">
+        <div class="section-heading"><div><span class="eyebrow dark">DATEN BEHALTEN · GERÄTE VERBINDEN</span><h2>Speichern & GitHub</h2><p>Änderungen werden sofort auf diesem Gerät gespeichert. Für alle Geräte kannst du zusätzlich eine JSON-Datei im GitHub-Repository verwenden.</p></div></div>
+        <div class="storage-status"><div><span class="storage-dot"></span><strong>Lokaler Speicher</strong><p id="local-save-state">Noch keine Änderung gespeichert</p></div><div><span class="storage-dot remote"></span><strong>GitHub-Status</strong><p id="cloud-save-state">Noch nicht verbunden</p></div></div>
+        <div class="subpanel"><h3>1 · JSON-Backup ohne GitHub</h3><p>Ein Backup enthält Ist-Werte, beide Empfehlungen und dein komplettes Testfahrtenbuch. Es enthält niemals dein GitHub-Token.</p><div class="button-row"><button class="button primary" id="download-json">↧ JSON herunterladen</button><label class="button light upload-button">↥ JSON importieren<input type="file" id="import-json" accept=".json,application/json" hidden></label></div><div class="warning-small">Beim Import wird der lokale Datenbestand nach Bestätigung durch die importierten Daten ersetzt.</div></div>
+        <div class="subpanel"><h3>2 · GitHub-Repository verbinden</h3><p>Deine Daten liegen im Repository unter <code>data/bike-setup.json</code>. Die Website selbst liegt in den übrigen Dateien.</p>
+          <div class="settings-grid"><div class="field"><label for="gh-owner">GitHub-Nutzer</label><input id="gh-owner" autocomplete="off" placeholder="z. B. phusch"></div><div class="field"><label for="gh-repo">Repository</label><input id="gh-repo" autocomplete="off" placeholder="amflow-px-setup"></div><div class="field"><label for="gh-branch">Branch</label><input id="gh-branch" autocomplete="off" placeholder="main"></div><div class="field"><label for="gh-token">Fine-grained Token (nur zum Schreiben)</label><input id="gh-token" type="password" autocomplete="off" placeholder="github_pat_…"></div></div>
+          <label class="inline-check session-opt"><input type="checkbox" id="remember-token"> Token nur für diese Browser-Sitzung merken (nicht im JSON oder Repository)</label>
+          <div class="button-row"><button class="button light" id="gh-load">↓ Von GitHub laden</button><button class="button primary" id="gh-save">↑ Auf GitHub speichern</button><button class="button light" id="gh-clear-token">Token entfernen</button></div>
+          <div id="gh-message" class="gh-message" role="status" aria-live="polite">Noch keine GitHub-Aktion ausgeführt.</div>
+          <p class="explanation"><strong>Schutz vor Überschreiben:</strong> Wenn ein anderes Gerät zwischenzeitlich gespeichert hat, verhindert die App einen normalen Upload. Lade dann zuerst den aktuellen Cloudstand oder sichere deinen lokalen Stand als JSON.</p>
+        </div>
+      </section>
+      <section class="panel hidden" id="panel-help">
+        <div class="section-heading"><div><span class="eyebrow dark">KURZE ANLEITUNG</span><h2>So nutzt du das Cockpit</h2></div></div>
+        <div class="help-steps"><div class="help-step"><b>1</b><div><h3>Ist-Werte erfassen</h3><p>Öffne Avinox Ride und lies die aktuell eingestellten Motorwerte ab. Miss Gabel-/Dämpfer-SAG und die Reifenluftdrücke. Trage nur wirklich überprüfte Werte in „Mein Bike“ ein.</p></div></div><div class="help-step"><b>2</b><div><h3>Mit den beiden Empfehlungen vergleichen</h3><p>Waldtrail ist auf gemischte Waldtrails ausgelegt; Allgäu Berge auf längere Anstiege und alpine Schotterpassagen. Du kannst alle Profilwerte bearbeiten und ihre Originalvorschläge bei Bedarf zurücksetzen.</p></div></div><div class="help-step"><b>3</b><div><h3>Eine Veränderung testen</h3><p>Übertrage die gewünschten Parameter manuell in die Avinox Ride App bzw. stelle das Fahrwerk ein. Notiere danach die tatsächlichen Ist-Werte und protokolliere unter „Testfahrten“ die Runde samt Höhenmetern, Verbrauch und Fahreindruck.</p></div></div><div class="help-step"><b>4</b><div><h3>Auf allen Geräten verwenden</h3><p>GitHub Pages veröffentlichen, Repositoryname im Reiter „Speichern & GitHub“ angeben, von GitHub laden und mit einem <em>fine-grained personal access token</em> dort speichern. Auf einem zweiten Gerät dieselbe GitHub-Pages-URL öffnen und zuerst „Von GitHub laden“ klicken.</p></div></div></div>
+        <div class="subpanel"><h3>GitHub Pages einmalig einrichten</h3><ol><li>Neues Repository anlegen (z. B. <code>amflow-px-setup</code>) und die Dateien des ZIP-Hauptordners hineinladen.</li><li>Unter <strong>Settings → Pages</strong> die Quelle <strong>Deploy from a branch</strong>, <strong>main</strong> und <strong>/(root)</strong> auswählen.</li><li>Die GitHub-Pages-Adresse öffnen und unter „Speichern & GitHub“ Nutzernamen und Repository eintragen.</li><li>Für das Schreiben auf GitHub einen <strong>Fine-grained personal access token</strong> anlegen: nur dieses Repository auswählen, Berechtigung <strong>Contents: Read and write</strong> aktivieren. Token im Cockpit eingeben und „Auf GitHub speichern“ nutzen.</li><li>Später auf jedem Gerät zuerst „Von GitHub laden“, dann Änderungen vornehmen, anschließend „Auf GitHub speichern“.</li></ol></div>
+        <div class="callout"><strong>Wichtig:</strong> Bei einem öffentlichen GitHub-Repository ist auch die Datei <code>data/bike-setup.json</code> öffentlich einsehbar und in der Commit-Historie nachvollziehbar. Keine privaten Notizen oder Zugangsdaten eintragen. Wenn du wirklich private Daten speichern willst, ist eine private Backend-Lösung besser geeignet.</div>
+        <p class="source-note">Quellen zur Funktionslogik: <a href="https://dl.avinox-ebike.com/downloads/Avinox/20260409/Avinox_Drive_System_User_Manual_EN.pdf" target="_blank" rel="noopener noreferrer">Avinox-Bedienungsanleitung 2026</a> · <a href="https://docs.github.com/en/rest/repos/contents" target="_blank" rel="noopener noreferrer">GitHub Contents API</a>. Die zwei Abstimmungen sind persönliche Startempfehlungen und keine freigegebenen Hersteller-Setups. Bitte nur zulässige Einstellungen verwenden.</p>
+      </section>
+    </main>
+    <footer><span>PX Setup Cockpit · V1.0.0</span><span>Keine direkte Verbindung zum Bike · lokale Datensicherung + optional GitHub</span></footer>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  </div>
+  <script defer src="app.js"></script>
+</body>
+</html>
