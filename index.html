@@ -12,12 +12,12 @@
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="stylesheet" href="styles.css">
-  <title>PX Setup Cockpit · V1.0.0</title>
+  <title>PX Setup Cockpit · V1.0.1</title>
 </head>
 <body>
   <div class="app-shell">
     <header class="hero">
-      <div class="hero-top"><div class="brand"><div class="brand-icon">PX<span>↗</span></div><div><span class="eyebrow">AMFLOW · AVINOX M2S</span><h1>Bike Setup Cockpit</h1></div></div><span class="version">V1.0.0</span></div>
+      <div class="hero-top"><div class="brand"><div class="brand-icon">PX<span>↗</span></div><div><span class="eyebrow">AMFLOW · AVINOX M2S</span><h1>Bike Setup Cockpit</h1></div></div><span class="am-head-tools"><button type="button" id="amOpenStorage" class="am-open-storage" aria-label="Huschel App Speicher öffnen" title="Speichern & Backup" aria-controls="amStorageView">☁ <span class="am-open-storage-label">Speicher</span></button><span class="version">V1.0.1</span></span></div>
       <p>Deine Ist-Einstellungen, zwei Tourenprofile und echte Testfahrten – auf Mac, iPad und iPhone.</p>
       <div class="hero-bottom"><span class="hero-tag">90–99 kg inkl. Ausrüstung</span><span class="hero-tag">Tubeless</span><span class="hero-tag">PX Carbon Pro · 2026</span></div>
     </header>
@@ -77,9 +77,49 @@
         <p class="source-note">Quellen zur Funktionslogik: <a href="https://dl.avinox-ebike.com/downloads/Avinox/20260409/Avinox_Drive_System_User_Manual_EN.pdf" target="_blank" rel="noopener noreferrer">Avinox-Bedienungsanleitung 2026</a> · <a href="https://docs.github.com/en/rest/repos/contents" target="_blank" rel="noopener noreferrer">GitHub Contents API</a>. Die zwei Abstimmungen sind persönliche Startempfehlungen und keine freigegebenen Hersteller-Setups. Bitte nur zulässige Einstellungen verwenden.</p>
       </section>
     </main>
-    <footer><span>PX Setup Cockpit · V1.0.0</span><span>Keine direkte Verbindung zum Bike · lokale Datensicherung + optional GitHub</span></footer>
+    <footer><span>PX Setup Cockpit · V1.0.1</span><span>Keine direkte Verbindung zum Bike · lokale Datensicherung + optional GitHub</span></footer>
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   </div>
+  <section id="amStorageView" class="am-storage-view" aria-label="Huschel App Speicher" hidden>
+    <div class="am-storage-inner">
+      <div class="am-storage-heading"><button type="button" id="amStorageBack" class="am-storage-back">← Zurück</button><div><h1>Speichern & Backup</h1><p>Huschel App Speicher · Amflow PX Setup</p></div></div>
+      <div id="amLamp" class="am-storage-lamp" role="status" aria-live="polite">🟡 GitHub-Speicherstand noch nicht geprüft</div>
+      <p id="amMeta" class="am-storage-meta">Privater GitHub-Speicher · Revision: nicht geprüft · Letzte Speicherung: –</p>
+      <section class="am-storage-panel am-storage-cloud">
+        <h2>☁ GitHub – bevorzugter Speicher</h2>
+        <button type="button" id="amGithubSave" class="am-storage-btn am-storage-primary">☁ GitHub Speichern</button>
+        <button type="button" id="amGithubLoad" class="am-storage-btn am-storage-secondary">☁ GitHub Laden</button>
+        <p>Vor dem ersten Speichern einmal GitHub laden, damit Versionskonflikte erkannt werden. Privater Speicher: <code>amflow-px-setup/data.json</code>.</p>
+      </section>
+      <section class="am-storage-panel am-storage-auth" id="amAuthPanel">
+        <h2>Anmeldung</h2>
+        <div id="amAuthStatus" class="am-storage-auth-status" role="status">⚪ Nicht angemeldet · für GitHub bitte anmelden</div>
+        <div id="amAuthFields">
+          <label for="amKey">Supabase Publishable Key</label><input type="text" id="amKey" autocomplete="off" placeholder="sb_publishable_…" spellcheck="false">
+          <label for="amEmail">E-Mail</label><input type="email" id="amEmail" autocomplete="username" value="huschka@eventdesign.com">
+          <label for="amPass">Passwort</label><input type="password" id="amPass" autocomplete="current-password">
+          <button type="button" id="amLogin" class="am-storage-btn am-storage-muted">Anmelden</button>
+        </div>
+        <div id="amSignedIn" hidden><p id="amEmailDisplay"></p><button type="button" id="amLogout" class="am-storage-btn am-storage-muted">Abmelden</button></div>
+        <p>Auf diesem Gerät bleibt die gültige Supabase-Sitzung erhalten. Das Passwort wird nicht gespeichert.</p>
+      </section>
+      <section class="am-storage-panel">
+        <h2>Lokal – Gerätespeicher</h2>
+        <p>Die bisherige automatische Speicherung im Browser bleibt aktiv.</p>
+        <div class="am-storage-two"><button type="button" id="amLocalSave" class="am-storage-btn am-storage-muted">Lokal Speichern</button><button type="button" id="amLocalLoad" class="am-storage-btn am-storage-muted">Lokal Laden</button></div>
+      </section>
+      <section class="am-storage-panel">
+        <h2>Backup – JSON-Datei</h2>
+        <div class="am-storage-two"><button type="button" id="amExport" class="am-storage-btn am-storage-muted">JSON erstellen</button><button type="button" id="amImport" class="am-storage-btn am-storage-muted">JSON laden</button></div>
+        <input type="file" id="amFile" accept=".json,application/json" hidden>
+        <p>Enthält alle drei Profile und Testfahrten inklusive gespeicherter Einstellungs-Schnappschüsse.</p>
+      </section>
+      <div id="amMessage" class="am-storage-message" role="status" aria-live="polite">Hier erscheinen konkrete Meldungen zu Speichern, Laden, Abbruch oder Konflikten.</div>
+      <p class="am-storage-footnote">Die bisherige direkte GitHub-Synchronisierung unter „Speichern & GitHub“ bleibt vorerst unverändert bestehen. Sie ist unabhängig vom privaten Huschel-Speicher.</p>
+    </div>
+  </section>
+  <link rel="stylesheet" href="huschel-amflow-speicher.css">
   <script defer src="app.js"></script>
+  <script type="module" src="huschel-amflow-speicher.js"></script>
 </body>
 </html>

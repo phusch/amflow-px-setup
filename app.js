@@ -116,7 +116,7 @@ let config={owner:'phusch',repo:'',branch:'main',lastRemoteSha:null,lastSyncedAt
 try{const loaded=JSON.parse(localStorage.getItem(CONFIG_KEY)||'null');if(loaded&&typeof loaded==='object')config={...config,...loaded};}catch{}
 let toastTimer;
 function toast(msg){const target=byId('toast');target.textContent=msg;target.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>target.classList.add('hidden'),3500);}
-function persist(){state.meta.updatedAt=stamp();try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{toast('Browser-Speicher nicht verfügbar: bitte JSON sichern.');}updateStatus();}
+function persist(){state.meta.updatedAt=stamp();try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{toast('Browser-Speicher nicht verfügbar: bitte JSON sichern.');}updateStatus();window.dispatchEvent(new Event('huschel:amflow-geaendert'));}
 function saveConfig(){localStorage.setItem(CONFIG_KEY,JSON.stringify(config));updateStatus();}
 function updateStatus(){byId('local-save-state').textContent=state.meta.updatedAt?'Zuletzt aktualisiert: '+humanStamp(state.meta.updatedAt):'Noch keine Änderung gespeichert';byId('cloud-save-state').textContent=config.lastSyncedAt&&config.lastSyncedTarget===targetKey()?'Zuletzt synchronisiert: '+humanStamp(config.lastSyncedAt)+(config.lastSyncedLocalUpdatedAt!==state.meta.updatedAt?' · Lokale Änderungen noch NICHT hochgeladen':' · Aktuell auf diesem Gerät'):'Noch kein gemeinsamer Cloudstand geladen / gespeichert';}
 function el(tag,css='',text=''){const node=document.createElement(tag);if(css)node.className=css;if(text)node.textContent=text;return node;}
@@ -221,5 +221,26 @@ async function safeStartupSync(){
   ghMessage('GitHub-Stand beim Start automatisch geladen.','success');toast('Aktuellen GitHub-Stand geladen.');
  }catch(err){console.info('Automatisches Cloud-Laden nicht verfügbar:',err.message);}
 }
+// Additive Brücke: Das Huschel-Speichermodul verwendet dieselben echten App-Daten
+// und denselben lokalen Speicher. Bestehende Direkt-GitHub-Funktionen bleiben erhalten.
+window.HuschelAmflowBridge = {
+  read: () => exportable(),
+  validate: value => validateData(value),
+  apply: value => {
+    const checked = validateData(value);
+    state = checked;
+    persist();
+    buildComparison();
+    renderRides();
+    resetRideForm();
+    window.dispatchEvent(new Event('huschel:amflow-geaendert'));
+  },
+  localRaw: () => localStorage.getItem(STORAGE_KEY),
+  localSave: () => {
+    persist();
+    return localStorage.getItem(STORAGE_KEY) !== null;
+  },
+  exportJson: () => jsonDownload()
+};
 safeStartupSync();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.info('Offline-Modus nicht verfügbar:',err)));

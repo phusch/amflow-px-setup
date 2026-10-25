@@ -1,0 +1,47 @@
+/* Huschel App Speicher – zusätzliche Ansicht für Amflow PX Setup V1.0.1.
+   Bewusst nur .am-... Selektoren; keine Änderung des ursprünglichen Designs. */
+.am-head-tools{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.am-open-storage{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.11);color:#fff;padding:9px 11px;border-radius:11px;font-size:16px;font-weight:740;cursor:pointer;position:relative;z-index:1}
+.am-open-storage:hover,.am-open-storage:focus-visible{background:rgba(255,255,255,.23)}
+.am-open-storage-label{font-size:12px}
+body.am-storage-open{background:#eef2f3}
+body.am-storage-open>.app-shell{display:none}
+.am-storage-view[hidden],.am-storage-view [hidden]{display:none!important}
+.am-storage-view{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,Helvetica,sans-serif;color:#213747;background:#eef2f3;min-height:100vh;padding:24px 14px 45px}
+.am-storage-inner{max-width:750px;margin:0 auto}
+.am-storage-heading{display:flex;align-items:center;gap:15px;margin-bottom:23px}
+.am-storage-heading h1{font-size:26px;letter-spacing:-.03em;margin:0;color:#183044}
+.am-storage-heading p{font-size:13px;margin:4px 0 0;color:#687c89}
+.am-storage-back{border:1px solid #cbd7dd;background:#fff;border-radius:10px;padding:11px 14px;font-size:14px;font-weight:720;color:#305265;white-space:nowrap}
+.am-storage-lamp{border:2px solid #e2b85f;border-radius:15px;padding:20px 18px;background:#fff5d9;color:#674d19;font-size:18px;line-height:1.4;font-weight:780}
+.am-storage-lamp.ok{border-color:#5cb98a;background:#ddf5e6;color:#17553a}
+.am-storage-lamp.error{border-color:#df7883;background:#ffeaec;color:#922e39}
+.am-storage-meta{font-size:13px;color:#657b87;margin:10px 2px 20px;line-height:1.5}
+.am-storage-panel{border-radius:15px;background:#fff;border:1px solid #dae3e7;margin:14px 0;padding:18px;box-shadow:0 4px 18px rgba(18,46,55,.025)}
+.am-storage-panel h2{font-size:17px;font-weight:780;margin:0 0 13px;color:#203b4b}
+.am-storage-panel p{font-size:13px;line-height:1.55;color:#667986;margin:10px 0 0}
+.am-storage-panel code{font-size:12px;overflow-wrap:anywhere;color:#214a60}
+.am-storage-cloud{border-color:#8cb5cc;background:#f9fcff}
+.am-storage-btn{width:100%;display:block;margin:8px 0;border-radius:11px;padding:14px 12px;font:inherit;font-size:15px;font-weight:730;cursor:pointer;border:1px solid #b6c9d3}
+.am-storage-btn:disabled{cursor:wait;opacity:.53}
+.am-storage-primary{background:linear-gradient(110deg,#226eaa,#377abe);border-color:#357bb6;color:white;font-size:17px}
+.am-storage-secondary{background:#e9f2fa;border-color:#83abc8;color:#1d5378;font-size:16px}
+.am-storage-muted{background:#f2f6f8;border-color:#cedce3;color:#315267}
+.am-storage-auth-status{border:1px solid #d0dde4;border-radius:10px;padding:11px 12px;background:#f4f7f9;color:#657786;font-size:14px;font-weight:740}
+.am-storage-auth-status.ok{background:#e0f6e7;border-color:#85c9a0;color:#16623c}
+.am-storage-auth-status.error{background:#ffeaea;border-color:#df9191;color:#923534}
+.am-storage-auth.signed-in{background:#f8fefa;border-color:#a6d6b6}
+.am-storage-panel label{display:block;font-size:12px;font-weight:680;margin:13px 0 6px;color:#435d6b}
+.am-storage-panel input:not([type=file]){box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd8df;background:#fff;border-radius:9px;font:inherit;font-size:16px;color:#213746}
+.am-storage-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.am-storage-message{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.6;color:#466475;margin:16px 2px;border-left:4px solid #9dbbcf;padding:12px 15px;background:#fff;border-radius:0 10px 10px 0}
+.am-storage-footnote{font-size:12px;color:#6c7d86;line-height:1.55}
+@media(max-width:620px){
+  .am-head-tools{gap:6px}.am-open-storage{padding:9px 10px;font-size:18px}.am-open-storage-label{display:none}
+  .am-storage-view{padding:16px 10px 30px}.am-storage-heading h1{font-size:22px}
+  .am-storage-heading{gap:10px}.am-storage-back{padding:10px}
+  .am-storage-lamp{font-size:17px;padding:17px 14px}
+  .am-storage-panel{padding:15px}.am-storage-two{gap:6px}
+  .am-storage-two .am-storage-btn{font-size:13px;padding:12px 6px}
+}
+@media print {.am-open-storage,.am-storage-view{display:none!important}}
