@@ -1,4 +1,4 @@
-const CACHE='px-setup-static-v1.0.1-huschel';
+const CACHE='px-setup-static-v1.1-huschel';
 const ASSETS=['./','./index.html','./styles.css','./app.js','./huschel-amflow-speicher.css','./huschel-amflow-speicher.js','./manifest.webmanifest','./assets/icon.svg','./assets/icon-192.png','./assets/icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('px-setup-')&&key!==CACHE).map(key=>caches.delete(key)))),self.clients.claim()])));

@@ -1,10 +1,7 @@
 'use strict';
-/* Amflow PX Setup Cockpit V1.0.0 · bewusst ohne externe Bibliotheken */
+/* Amflow PX Setup Cockpit V1.1 · bestehendes Datenmodell, automatische lokale Speicherung */
 const STORAGE_KEY='amflow-px-setup-data-v1';
-const CONFIG_KEY='amflow-px-setup-github-v1';
-const TOKEN_KEY='amflow-px-setup-token-session';
 const SCHEMA_VERSION=1;
-const CLOUD_PATH='data/bike-setup.json';
 const batteryCapacityWh=700;
 
 // Jede Zeile: [Schlüssel, Beschriftung, Einheit/Hinweis, Waldtrail, Allgäu Berge].
@@ -112,13 +109,9 @@ function validateData(raw){
 }
 function readLocal(){try{const saved=localStorage.getItem(STORAGE_KEY);if(saved)return validateData(JSON.parse(saved));}catch(err){console.warn('Lokalen Speicher nicht lesbar:',err);}return freshState();}
 let state=readLocal();
-let config={owner:'phusch',repo:'',branch:'main',lastRemoteSha:null,lastSyncedAt:null,lastSyncedTarget:null,lastSyncedLocalUpdatedAt:null};
-try{const loaded=JSON.parse(localStorage.getItem(CONFIG_KEY)||'null');if(loaded&&typeof loaded==='object')config={...config,...loaded};}catch{}
 let toastTimer;
 function toast(msg){const target=byId('toast');target.textContent=msg;target.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>target.classList.add('hidden'),3500);}
-function persist(){state.meta.updatedAt=stamp();try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{toast('Browser-Speicher nicht verfügbar: bitte JSON sichern.');}updateStatus();window.dispatchEvent(new Event('huschel:amflow-geaendert'));}
-function saveConfig(){localStorage.setItem(CONFIG_KEY,JSON.stringify(config));updateStatus();}
-function updateStatus(){byId('local-save-state').textContent=state.meta.updatedAt?'Zuletzt aktualisiert: '+humanStamp(state.meta.updatedAt):'Noch keine Änderung gespeichert';byId('cloud-save-state').textContent=config.lastSyncedAt&&config.lastSyncedTarget===targetKey()?'Zuletzt synchronisiert: '+humanStamp(config.lastSyncedAt)+(config.lastSyncedLocalUpdatedAt!==state.meta.updatedAt?' · Lokale Änderungen noch NICHT hochgeladen':' · Aktuell auf diesem Gerät'):'Noch kein gemeinsamer Cloudstand geladen / gespeichert';}
+function persist(){state.meta.updatedAt=stamp();try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{toast('Browser-Speicher nicht verfügbar: bitte JSON sichern.');}window.dispatchEvent(new Event('huschel:amflow-geaendert'));}
 function el(tag,css='',text=''){const node=document.createElement(tag);if(css)node.className=css;if(text)node.textContent=text;return node;}
 
 function buildComparison(){
@@ -150,10 +143,8 @@ byId('reset-recos').addEventListener('click',()=>{if(!confirm('Beide Empfehlunge
 function exportable(){return clone(state);}
 function download(filename,text,format='application/json'){const blob=new Blob([text],{type:format});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function jsonDownload(){download('Amflow_PX_Setup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(exportable(),null,2));toast('JSON-Backup heruntergeladen.');}
-byId('download-json').addEventListener('click',jsonDownload);byId('download-json-compare').addEventListener('click',jsonDownload);
 function csvEscape(value){const s=String(value??'');return '"'+s.replaceAll('"','""')+'"';}
 byId('export-csv').addEventListener('click',()=>{const lines=[['Bereich','Parameter','Einheit / Hinweis','Mein Bike (Ist)','Waldtrail','Allgäu Berge']];for(const r of ROWS)lines.push([r.group,r.name,r.unit,state.profiles.current[r.key]||'',state.profiles.forest[r.key]||'',state.profiles.alpine[r.key]||'']);download('Amflow_PX_Setup_Vergleich.csv','\uFEFF'+lines.map(r=>r.map(csvEscape).join(';')).join('\r\n'),'text/csv;charset=utf-8');toast('Vergleich als CSV exportiert.');});
-byId('import-json').addEventListener('change',async event=>{const f=event.target.files?.[0];if(!f)return;try{if(f.size>3_000_000)throw Error('Datei ist größer als 3 MB.');const replacement=validateData(JSON.parse(await f.text()));if(!confirm('Lokale Ist-Werte, Empfehlungen und Testfahrten durch die JSON-Datei ersetzen? Lade bei Bedarf vorher ein Backup herunter.'))return;state=replacement;persist();buildComparison();renderRides();toast('JSON erfolgreich importiert.');}catch(err){alert('JSON konnte nicht importiert werden: '+err.message);}finally{event.target.value='';}});
 
 const rideFields={id:'ride-id',date:'ride-date',profile:'ride-profile',route:'ride-route',km:'ride-km',hm:'ride-hm',batStart:'ride-batstart',batEnd:'ride-batend',surface:'ride-surface',traction:'ride-traction',comfort:'ride-comfort',drive:'ride-drive',notes:'ride-notes'};
 const names={current:'Mein Bike',forest:'Waldtrail',alpine:'Allgäu Berge'};
@@ -175,54 +166,13 @@ function renderRides(){const host=byId('ride-list');host.replaceChildren();const
  }
 }
 
-function targetKey(){return [config.owner?.trim(),config.repo?.trim(),config.branch?.trim()].join('/');}
-function ghUrl(){const owner=byId('gh-owner').value.trim();const repo=byId('gh-repo').value.trim();const branch=byId('gh-branch').value.trim();if(!/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(owner)||!/^[\w.-]{1,100}$/.test(repo)||!branch||/[?#]/.test(branch))throw Error('GitHub-Name, Repository oder Branch ist ungültig.');return `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${CLOUD_PATH}?ref=${encodeURIComponent(branch)}`;}
-function currentGh(){return {owner:byId('gh-owner').value.trim(),repo:byId('gh-repo').value.trim(),branch:byId('gh-branch').value.trim()};}
-function saveGhInputs(){const cfg=currentGh();const changed=[cfg.owner,cfg.repo,cfg.branch].join('/')!==targetKey();config.owner=cfg.owner;config.repo=cfg.repo;config.branch=cfg.branch;if(changed){config.lastRemoteSha=null;config.lastSyncedAt=null;config.lastSyncedTarget=null;config.lastSyncedLocalUpdatedAt=null;}saveConfig();}
-for(const id of ['gh-owner','gh-repo','gh-branch'])byId(id).addEventListener('change',saveGhInputs);
-const getToken=()=>byId('gh-token').value.trim();
-function ghMessage(message,kind=''){const div=byId('gh-message');div.className='gh-message'+(kind?' '+kind:'');div.textContent=message;}
-function authHeaders(){const headers={'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};if(getToken())headers.Authorization='Bearer '+getToken();return headers;}
-function lockButtons(locked){for(const id of ['gh-save','gh-load'])byId(id).disabled=locked;}
-function decodeBase64(encoded){const bytes=Uint8Array.from(atob(encoded.replace(/\s/g,'')),c=>c.charCodeAt(0));return new TextDecoder('utf-8').decode(bytes);}
-function encodeBase64(text){const bytes=new TextEncoder().encode(text);let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(binary);}
-async function getRemote(){const url=ghUrl();const resp=await fetch(url,{headers:authHeaders(),cache:'no-store'});if(resp.status===404)return null;const data=await resp.json().catch(()=>({}));if(!resp.ok)throw Error(`GitHub antwortet mit HTTP ${resp.status}: ${data.message||'Unbekannter Fehler'}`);if(!data.sha||!data.content||data.encoding!=='base64')throw Error('GitHub hat keine lesbare JSON-Datei geliefert.');return {sha:data.sha,data:validateData(JSON.parse(decodeBase64(data.content)))};}
-byId('gh-load').addEventListener('click',async()=>{saveGhInputs();lockButtons(true);ghMessage('Lese GitHub-Datei …');try{const remote=await getRemote();if(!remote)throw Error('Unter '+CLOUD_PATH+' liegt noch keine Cloud-Datei. Speichere zunächst deinen lokalen Stand nach GitHub.');const hasData=Object.values(state.profiles.current).some(x=>String(x).trim())||state.rides.length||Boolean(state.meta.updatedAt);if(hasData&&!confirm('GitHub-Daten herunterladen und damit die lokalen Ist-Werte, Empfehlungen und Testfahrten ersetzen? Vorher ggf. JSON-Backup herunterladen.')){ghMessage('Laden abgebrochen.');return;}state=remote.data;persist();buildComparison();renderRides();config.lastRemoteSha=remote.sha;config.lastSyncedAt=stamp();config.lastSyncedTarget=targetKey();config.lastSyncedLocalUpdatedAt=state.meta.updatedAt;saveConfig();ghMessage('GitHub-Daten erfolgreich geladen: '+humanStamp(config.lastSyncedAt),'success');toast('Cloudstand geladen.');}catch(err){ghMessage('Laden fehlgeschlagen: '+err.message,'error');}finally{lockButtons(false);}});
-byId('gh-save').addEventListener('click',async()=>{saveGhInputs();if(!getToken()){ghMessage('Zum Speichern auf GitHub ist ein Token mit „Contents: Read and write“ für dieses Repository erforderlich.','error');return;}lockButtons(true);ghMessage('Prüfe aktuellen GitHub-Stand …');try{const remote=await getRemote();if(remote&&!config.lastRemoteSha){throw Error('Es gibt bereits Cloud-Daten. Bitte zuerst „Von GitHub laden“, um versehentliches Überschreiben zu vermeiden. Vorher deinen lokalen Stand als JSON sichern.');}if(remote&&remote.sha!==config.lastRemoteSha){throw Error('Konflikt: GitHub wurde seit dem letzten Laden von einem anderen Gerät aktualisiert. Bitte zuerst lokal ein JSON-Backup erstellen, dann „Von GitHub laden“.');}if(!remote&&config.lastRemoteSha){throw Error('Die Cloud-Datei wurde seit deiner letzten Synchronisierung entfernt. Bitte die Situation im Repository prüfen.');}
-  const c=currentGh();const url=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${CLOUD_PATH}`;
-  const payload={message:'PX Setup: Ist-Werte und Testfahrten aktualisieren',content:encodeBase64(JSON.stringify(exportable(),null,2)),branch:c.branch};if(remote)payload.sha=remote.sha;
-  const resp=await fetch(url,{method:'PUT',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  const result=await resp.json().catch(()=>({}));if(!resp.ok)throw Error(`Upload fehlgeschlagen (HTTP ${resp.status}): ${result.message||'Fehler'}${resp.status===409?' – Änderungen auf GitHub prüfen.':''}`);
-  if(!result.content?.sha)throw Error('GitHub hat keinen bestätigten Datei-Stand zurückgegeben.');
-  config.lastRemoteSha=result.content.sha;config.lastSyncedAt=stamp();config.lastSyncedTarget=targetKey();config.lastSyncedLocalUpdatedAt=state.meta.updatedAt;saveConfig();ghMessage('Erfolgreich auf GitHub gespeichert: '+humanStamp(config.lastSyncedAt)+'\nDatei: '+CLOUD_PATH,'success');toast('GitHub-Synchronisierung erfolgreich.');
- }catch(err){ghMessage('Speichern fehlgeschlagen: '+err.message,'error');}finally{lockButtons(false);}});
-byId('gh-token').addEventListener('input',()=>{if(byId('remember-token').checked)sessionStorage.setItem(TOKEN_KEY,getToken());});
-byId('remember-token').addEventListener('change',e=>{if(e.target.checked)sessionStorage.setItem(TOKEN_KEY,getToken());else sessionStorage.removeItem(TOKEN_KEY);});
-byId('gh-clear-token').addEventListener('click',()=>{byId('gh-token').value='';byId('remember-token').checked=false;sessionStorage.removeItem(TOKEN_KEY);toast('Token aus dieser Browser-Sitzung entfernt.');});
-
 for(const tab of document.querySelectorAll('.tab'))tab.addEventListener('click',()=>{
  const id=tab.dataset.tab;for(const item of document.querySelectorAll('.tab')){const active=item===tab;item.classList.toggle('active',active);if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');}
- for(const panel of ['compare','rides','sync','help'])byId('panel-'+panel).classList.toggle('hidden',panel!==id);
+ for(const panel of ['compare','rides','help'])byId('panel-'+panel).classList.toggle('hidden',panel!==id);
  window.scrollTo({top:0,behavior:'instant'});
 });
-byId('gh-owner').value=config.owner||'phusch';byId('gh-repo').value=config.repo||'';byId('gh-branch').value=config.branch||'main';
-try{const t=sessionStorage.getItem(TOKEN_KEY);if(t){byId('gh-token').value=t;byId('remember-token').checked=true;}}catch{}
-resetRideForm();buildComparison();renderRides();updateStatus();
-// Automatisch NUR herunterladen, wenn noch keine ungesicherten lokalen Änderungen vorliegen.
-async function safeStartupSync(){
- if(!config.repo||!config.owner)return;
- const untouched=!state.meta.updatedAt&&!Object.keys(state.profiles.current).length&&!state.rides.length;
- const safelySynced=config.lastSyncedTarget===targetKey()&&config.lastSyncedLocalUpdatedAt&&config.lastSyncedLocalUpdatedAt===state.meta.updatedAt;
- if(!untouched&&!safelySynced)return;
- try{const remote=await getRemote();if(!remote)return;
-  if(config.lastRemoteSha===remote.sha)return;
-  state=remote.data;persist();buildComparison();renderRides();
-  config.lastRemoteSha=remote.sha;config.lastSyncedAt=stamp();config.lastSyncedTarget=targetKey();config.lastSyncedLocalUpdatedAt=state.meta.updatedAt;saveConfig();
-  ghMessage('GitHub-Stand beim Start automatisch geladen.','success');toast('Aktuellen GitHub-Stand geladen.');
- }catch(err){console.info('Automatisches Cloud-Laden nicht verfügbar:',err.message);}
-}
-// Additive Brücke: Das Huschel-Speichermodul verwendet dieselben echten App-Daten
-// und denselben lokalen Speicher. Bestehende Direkt-GitHub-Funktionen bleiben erhalten.
+resetRideForm();buildComparison();renderRides();
+// Datenbrücke zum Huschel-Speichermodul: gleiches Schema und gleicher lokaler Speicher.
 window.HuschelAmflowBridge = {
   read: () => exportable(),
   validate: value => validateData(value),
@@ -242,5 +192,6 @@ window.HuschelAmflowBridge = {
   },
   exportJson: () => jsonDownload()
 };
-safeStartupSync();
+// Nicht mehr benötigte, potenziell gespeicherte Legacy-GitHub-Tokens aus der Sitzung entfernen.
+try { sessionStorage.removeItem('amflow-px-setup-token-session'); } catch {}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.info('Offline-Modus nicht verfügbar:',err)));

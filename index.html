@@ -12,19 +12,18 @@
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="stylesheet" href="styles.css">
-  <title>PX Setup Cockpit · V1.0.1</title>
+  <title>PX Setup Cockpit · V1.1</title>
 </head>
 <body>
   <div class="app-shell">
     <header class="hero">
-      <div class="hero-top"><div class="brand"><div class="brand-icon">PX<span>↗</span></div><div><span class="eyebrow">AMFLOW · AVINOX M2S</span><h1>Bike Setup Cockpit</h1></div></div><span class="am-head-tools"><button type="button" id="amOpenStorage" class="am-open-storage" aria-label="Huschel App Speicher öffnen" title="Speichern & Backup" aria-controls="amStorageView">☁ <span class="am-open-storage-label">Speicher</span></button><span class="version">V1.0.1</span></span></div>
+      <div class="hero-top"><div class="brand"><div class="brand-icon">PX<span>↗</span></div><div><span class="eyebrow">AMFLOW · AVINOX M2S</span><h1>Bike Setup Cockpit</h1></div></div><span class="am-head-tools"><button type="button" id="amOpenStorage" class="am-open-storage" aria-label="Huschel App Speicher öffnen" title="Speichern & Backup" aria-controls="amStorageView">☁ <span class="am-open-storage-label">Speicher</span></button><span class="version">V1.1</span></span></div>
       <p>Deine Ist-Einstellungen, zwei Tourenprofile und echte Testfahrten – auf Mac, iPad und iPhone.</p>
       <div class="hero-bottom"><span class="hero-tag">90–99 kg inkl. Ausrüstung</span><span class="hero-tag">Tubeless</span><span class="hero-tag">PX Carbon Pro · 2026</span></div>
     </header>
     <nav class="tabs" aria-label="Hauptnavigation">
       <button class="tab active" data-tab="compare" aria-current="page">◫ <span>Vergleich</span></button>
       <button class="tab" data-tab="rides">↗ <span>Testfahrten</span></button>
-      <button class="tab" data-tab="sync">⇄ <span>Speichern & GitHub</span></button>
       <button class="tab" data-tab="help">ⓘ <span>Hilfe</span></button>
     </nav>
     <main>
@@ -34,7 +33,7 @@
         <div class="callout">ℹ️ Die App <strong>liest keine Einstellungen direkt aus dem Fahrrad</strong> und schreibt auch keine Werte in die Avinox Ride App. Du dokumentierst hier die Einstellungen und überträgst sie selbst am Bike.</div>
         <div class="compare-controls"><label for="group-filter">Anzeigen</label><select id="group-filter"><option value="all">Alle Einstellungen</option><option value="motor">Motor (ECO / AUTO / TRAIL / TURBO)</option><option value="fork">Gabel & Dämpfer</option><option value="tires">Reifen, Akku & Technik</option></select><label class="inline-check"><input type="checkbox" id="only-diffs"> Nur Unterschiede zwischen Empfehlungen</label></div>
         <div id="comparison-tables"></div>
-        <div class="action-strip"><button class="button light" id="reset-recos">↶ Empfehlungen zurücksetzen</button><button class="button primary" id="download-json-compare">↧ JSON-Backup</button></div>
+        <div class="action-strip"><button class="button light" id="reset-recos">↶ Empfehlungen zurücksetzen</button></div>
       </section>
       <section class="panel hidden" id="panel-rides">
         <div class="section-heading"><div><span class="eyebrow dark">LERNEN STATT RATEN</span><h2>Testfahrten protokollieren</h2><p>Fahre möglichst dieselbe Runde und verändere pro Test nur wenige Einstellungen.</p></div></div>
@@ -57,27 +56,15 @@
         <div class="ride-list-heading"><h3>Dein Fahrtenbuch</h3><span id="ride-count" class="subtle"></span></div>
         <div id="ride-list" class="ride-list"></div>
       </section>
-      <section class="panel hidden" id="panel-sync">
-        <div class="section-heading"><div><span class="eyebrow dark">DATEN BEHALTEN · GERÄTE VERBINDEN</span><h2>Speichern & GitHub</h2><p>Änderungen werden sofort auf diesem Gerät gespeichert. Für alle Geräte kannst du zusätzlich eine JSON-Datei im GitHub-Repository verwenden.</p></div></div>
-        <div class="storage-status"><div><span class="storage-dot"></span><strong>Lokaler Speicher</strong><p id="local-save-state">Noch keine Änderung gespeichert</p></div><div><span class="storage-dot remote"></span><strong>GitHub-Status</strong><p id="cloud-save-state">Noch nicht verbunden</p></div></div>
-        <div class="subpanel"><h3>1 · JSON-Backup ohne GitHub</h3><p>Ein Backup enthält Ist-Werte, beide Empfehlungen und dein komplettes Testfahrtenbuch. Es enthält niemals dein GitHub-Token.</p><div class="button-row"><button class="button primary" id="download-json">↧ JSON herunterladen</button><label class="button light upload-button">↥ JSON importieren<input type="file" id="import-json" accept=".json,application/json" hidden></label></div><div class="warning-small">Beim Import wird der lokale Datenbestand nach Bestätigung durch die importierten Daten ersetzt.</div></div>
-        <div class="subpanel"><h3>2 · GitHub-Repository verbinden</h3><p>Deine Daten liegen im Repository unter <code>data/bike-setup.json</code>. Die Website selbst liegt in den übrigen Dateien.</p>
-          <div class="settings-grid"><div class="field"><label for="gh-owner">GitHub-Nutzer</label><input id="gh-owner" autocomplete="off" placeholder="z. B. phusch"></div><div class="field"><label for="gh-repo">Repository</label><input id="gh-repo" autocomplete="off" placeholder="amflow-px-setup"></div><div class="field"><label for="gh-branch">Branch</label><input id="gh-branch" autocomplete="off" placeholder="main"></div><div class="field"><label for="gh-token">Fine-grained Token (nur zum Schreiben)</label><input id="gh-token" type="password" autocomplete="off" placeholder="github_pat_…"></div></div>
-          <label class="inline-check session-opt"><input type="checkbox" id="remember-token"> Token nur für diese Browser-Sitzung merken (nicht im JSON oder Repository)</label>
-          <div class="button-row"><button class="button light" id="gh-load">↓ Von GitHub laden</button><button class="button primary" id="gh-save">↑ Auf GitHub speichern</button><button class="button light" id="gh-clear-token">Token entfernen</button></div>
-          <div id="gh-message" class="gh-message" role="status" aria-live="polite">Noch keine GitHub-Aktion ausgeführt.</div>
-          <p class="explanation"><strong>Schutz vor Überschreiben:</strong> Wenn ein anderes Gerät zwischenzeitlich gespeichert hat, verhindert die App einen normalen Upload. Lade dann zuerst den aktuellen Cloudstand oder sichere deinen lokalen Stand als JSON.</p>
-        </div>
-      </section>
       <section class="panel hidden" id="panel-help">
         <div class="section-heading"><div><span class="eyebrow dark">KURZE ANLEITUNG</span><h2>So nutzt du das Cockpit</h2></div></div>
-        <div class="help-steps"><div class="help-step"><b>1</b><div><h3>Ist-Werte erfassen</h3><p>Öffne Avinox Ride und lies die aktuell eingestellten Motorwerte ab. Miss Gabel-/Dämpfer-SAG und die Reifenluftdrücke. Trage nur wirklich überprüfte Werte in „Mein Bike“ ein.</p></div></div><div class="help-step"><b>2</b><div><h3>Mit den beiden Empfehlungen vergleichen</h3><p>Waldtrail ist auf gemischte Waldtrails ausgelegt; Allgäu Berge auf längere Anstiege und alpine Schotterpassagen. Du kannst alle Profilwerte bearbeiten und ihre Originalvorschläge bei Bedarf zurücksetzen.</p></div></div><div class="help-step"><b>3</b><div><h3>Eine Veränderung testen</h3><p>Übertrage die gewünschten Parameter manuell in die Avinox Ride App bzw. stelle das Fahrwerk ein. Notiere danach die tatsächlichen Ist-Werte und protokolliere unter „Testfahrten“ die Runde samt Höhenmetern, Verbrauch und Fahreindruck.</p></div></div><div class="help-step"><b>4</b><div><h3>Auf allen Geräten verwenden</h3><p>GitHub Pages veröffentlichen, Repositoryname im Reiter „Speichern & GitHub“ angeben, von GitHub laden und mit einem <em>fine-grained personal access token</em> dort speichern. Auf einem zweiten Gerät dieselbe GitHub-Pages-URL öffnen und zuerst „Von GitHub laden“ klicken.</p></div></div></div>
-        <div class="subpanel"><h3>GitHub Pages einmalig einrichten</h3><ol><li>Neues Repository anlegen (z. B. <code>amflow-px-setup</code>) und die Dateien des ZIP-Hauptordners hineinladen.</li><li>Unter <strong>Settings → Pages</strong> die Quelle <strong>Deploy from a branch</strong>, <strong>main</strong> und <strong>/(root)</strong> auswählen.</li><li>Die GitHub-Pages-Adresse öffnen und unter „Speichern & GitHub“ Nutzernamen und Repository eintragen.</li><li>Für das Schreiben auf GitHub einen <strong>Fine-grained personal access token</strong> anlegen: nur dieses Repository auswählen, Berechtigung <strong>Contents: Read and write</strong> aktivieren. Token im Cockpit eingeben und „Auf GitHub speichern“ nutzen.</li><li>Später auf jedem Gerät zuerst „Von GitHub laden“, dann Änderungen vornehmen, anschließend „Auf GitHub speichern“.</li></ol></div>
-        <div class="callout"><strong>Wichtig:</strong> Bei einem öffentlichen GitHub-Repository ist auch die Datei <code>data/bike-setup.json</code> öffentlich einsehbar und in der Commit-Historie nachvollziehbar. Keine privaten Notizen oder Zugangsdaten eintragen. Wenn du wirklich private Daten speichern willst, ist eine private Backend-Lösung besser geeignet.</div>
-        <p class="source-note">Quellen zur Funktionslogik: <a href="https://dl.avinox-ebike.com/downloads/Avinox/20260409/Avinox_Drive_System_User_Manual_EN.pdf" target="_blank" rel="noopener noreferrer">Avinox-Bedienungsanleitung 2026</a> · <a href="https://docs.github.com/en/rest/repos/contents" target="_blank" rel="noopener noreferrer">GitHub Contents API</a>. Die zwei Abstimmungen sind persönliche Startempfehlungen und keine freigegebenen Hersteller-Setups. Bitte nur zulässige Einstellungen verwenden.</p>
+        <div class="help-steps"><div class="help-step"><b>1</b><div><h3>Ist-Werte erfassen</h3><p>Öffne Avinox Ride und lies die aktuell eingestellten Motorwerte ab. Miss Gabel-/Dämpfer-SAG und die Reifenluftdrücke. Trage nur wirklich überprüfte Werte in „Mein Bike“ ein.</p></div></div><div class="help-step"><b>2</b><div><h3>Mit den beiden Empfehlungen vergleichen</h3><p>Waldtrail ist auf gemischte Waldtrails ausgelegt; Allgäu Berge auf längere Anstiege und alpine Schotterpassagen. Du kannst alle Profilwerte bearbeiten und ihre Originalvorschläge bei Bedarf zurücksetzen.</p></div></div><div class="help-step"><b>3</b><div><h3>Eine Veränderung testen</h3><p>Übertrage die gewünschten Parameter manuell in die Avinox Ride App bzw. stelle das Fahrwerk ein. Notiere danach die tatsächlichen Ist-Werte und protokolliere unter „Testfahrten“ die Runde samt Höhenmetern, Verbrauch und Fahreindruck.</p></div></div><div class="help-step"><b>4</b><div><h3>Auf allen Geräten verwenden</h3><p>Über die Schaltfläche „☁ Speicher“ oben das separate Huschel-Speichermodul öffnen. Einmal über Supabase anmelden, zuerst „GitHub Laden“ zum Prüfen des privaten Stands, danach „GitHub Speichern“ zum Sichern. Auf weiteren Geräten denselben Speicher über die gleiche Speicherseite laden. Es wird kein GitHub-Token im Browser benötigt.</p></div></div></div>
+        <div class="subpanel"><h3>Speichern und Gerätewechsel</h3><ol><li>Bike-Werte oder Testfahrten eingeben – die App speichert automatisch lokal auf diesem Gerät.</li><li>Oben auf „☁ Speicher“ tippen. Die separate Speicherseite öffnet sich mit Speicherampel und Anmeldestatus.</li><li>Einmal mit deinem Supabase-App-Benutzer anmelden. Die Sitzung bleibt auf diesem Gerät erhalten, solange sie gültig ist.</li><li>„GitHub Laden“ zuerst zum Prüfen des letzten privaten Speicherstands wählen. Bei abweichenden Daten wird vor der Übernahme gefragt.</li><li>Mit „GitHub Speichern“ die aktuellen Profile und Testfahrten im privaten Speicher <code>amflow-px-setup/data.json</code> sichern.</li><li>Für ein unabhängiges Backup unter „Backup – JSON-Datei“ die Datei exportieren oder mit ausdrücklicher Bestätigung importieren.</li></ol></div>
+        <div class="callout"><strong>Datenschutz:</strong> Die Webseite liegt weiterhin in einem öffentlichen GitHub-Pages-Repository. Bike-Profile und Testfahrten sicherst du im <strong>separaten privaten</strong> Repository <code>phusch/huschel-app-data</code> unter <code>amflow-px-setup/data.json</code>. Die Anmeldung läuft über Supabase; das GitHub-Token wird ausschließlich in Supabase als Secret verwahrt. Lokale Änderungen werden nicht automatisch nach GitHub übertragen.</div>
+        <p class="source-note">Quellen zur Funktionslogik: <a href="https://dl.avinox-ebike.com/downloads/Avinox/20260409/Avinox_Drive_System_User_Manual_EN.pdf" target="_blank" rel="noopener noreferrer">Avinox-Bedienungsanleitung 2026</a>. Die zwei Abstimmungen sind persönliche Startempfehlungen und keine freigegebenen Hersteller-Setups. Bitte nur zulässige Einstellungen verwenden.</p>
       </section>
     </main>
-    <footer><span>PX Setup Cockpit · V1.0.1</span><span>Keine direkte Verbindung zum Bike · lokale Datensicherung + optional GitHub</span></footer>
+    <footer><span>PX Setup Cockpit · V1.1</span><span>Keine direkte Verbindung zum Bike · automatisch lokal + privater Huschel-Speicher</span></footer>
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   </div>
   <section id="amStorageView" class="am-storage-view" aria-label="Huschel App Speicher" hidden>
@@ -115,7 +102,7 @@
         <p>Enthält alle drei Profile und Testfahrten inklusive gespeicherter Einstellungs-Schnappschüsse.</p>
       </section>
       <div id="amMessage" class="am-storage-message" role="status" aria-live="polite">Hier erscheinen konkrete Meldungen zu Speichern, Laden, Abbruch oder Konflikten.</div>
-      <p class="am-storage-footnote">Die bisherige direkte GitHub-Synchronisierung unter „Speichern & GitHub“ bleibt vorerst unverändert bestehen. Sie ist unabhängig vom privaten Huschel-Speicher.</p>
+      <p class="am-storage-footnote">Dies ist die einzige manuelle Speicherverwaltung. Die automatische lokale Sicherung der Bike-Daten bleibt aktiv; GitHub wird ausschließlich auf deinen Klick hin aktualisiert.</p>
     </div>
   </section>
   <link rel="stylesheet" href="huschel-amflow-speicher.css">
